@@ -7,12 +7,19 @@ const app = express();
 app.use(cors({
     origin : process.env.CORS_ORIGIN , 
     credentials: true
-})); b
+}));
 
 app.use(express.json({limit : "16kb"}));
 app.use(express.urlencoded({extended:true , limit:"16k"}));
 app.use(express.static("public"));
 app.use(cookieParser());
+
+// import routes
+import userRouter from "./routes/user.routes.js"; // yha userRouter kyu liya jbki define to router hi tha bs route.js mei
+
+
+// routes declaration
+app.use("/api/v1/users",userRouter);
 
 
 export { app };
