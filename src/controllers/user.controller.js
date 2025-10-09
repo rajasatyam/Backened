@@ -7,16 +7,18 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 
 const registerUser = asyncHandler (async (req , res) => {
     const {fullname , email , username , password } = req.body;
+    console.log("FILES:", req.files);
+
     console.log(email , password); 
     if(
         [fullname,email,username,password].some((field) =>
-        field?.trim ==="") // check if the field is empty or not 
+        field?.trim() === "") // check if the field is empty or not 
     ){
         throw new ApiError(400 , " All fields are required")
     }
 
-    const existedUser = User.findOne({
-        $or : "[{username , {email}]"
+    const existedUser = await User.findOne({
+        $or: [{ username }, { email }]
     })
 
     if(existedUser){; 
@@ -29,12 +31,16 @@ const registerUser = asyncHandler (async (req , res) => {
     if(!avatarLocalPath){
         throw new ApiError(400 , "Avatar file is required");
     }
+    console.log("Avatar local path:", avatarLocalPath);
+    console.log("Cover image path:", coverImageLocalPath);
+
 
     const avatar = await uploadOnCloudinary(avatarLocalPath);
+    console.log(avatar,'see avatar')
     const coverImage = await uploadOnCloudinary(coverImageLocalPath);
 
     if(!avatar){
-        throw new ApiError(400 , "Avatar file is required");
+        throw new ApiError(500, "Failed to upload avatar to Cloudinary");
     }
 
     const user = await User.create({
