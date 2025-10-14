@@ -15,7 +15,8 @@ app.use(express.static("public"));
 app.use(cookieParser());
 
 // import routes
-import userRouter from "./routes/user.routes.js"; // yha userRouter kyu liya jbki define to router hi tha bs route.js mei
+import userRouter from "./routes/user.routes.js"; // yha userRouter kyu liya jbki define to router hi tha bs route.js mei - answer->
+// Each route file exports a router, but when importing it into your main app.js or server.js, you want to give it a meaningful name.
 
 
 // routes declaration
