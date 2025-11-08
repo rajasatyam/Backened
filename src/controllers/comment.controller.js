@@ -38,40 +38,53 @@ const addComment = asyncHandler(async (req, res) => {
 
 const updateComment = asyncHandler(async (req, res) => {
     // TODO: update a comment
-    const {videoId , commentId} = req.params
+    const {commentId} = req.params
     const {content} = req.body
 
-    const video = await Video.findById(videoId)
-    if(!video){
-        throw new ApiError(404 , "video does not exist")
-    }
-
     const comment = await Comment.findById(commentId)
+
     if(!comment){
         throw new ApiError(404 , "comments not exist for updation")
     }
+
     if(!content){
         throw new ApiError(400 , "content is required")
     }
+
     if(comment.owner.to_string() !== req.user?._id.to_string()){
         throw new ApiError(400 , "unauthorized request")
     }
 
     const updatedComment = await Comment.findByIdAndUpdate(
-        {
-            commentId,
-            content : content,
-            video: videoId,
-            owner : req.user?._id
-        }
+        commentId , 
+        { content : content} ,
+        { new : true }
     )
 
-    return res.status(201).json(new ApiResponse(200 , comment , "comment added successfully"))
+    if(!updatedComment){
+        throw new ApiError(500 , "Failed to update comment")
+    }
+
+    return res.status(201).json(new ApiResponse(200 , updatedComment , "comment updated successfully"))
     
 })
 
 const deleteComment = asyncHandler(async (req, res) => {
     // TODO: delete a comment
+    const {commentId} = req.params
+
+    const comment = await Comment.findById(commentId)
+    if(!comment){
+        throw new ApiError(404 , "comments not exist for updation")
+    }
+
+    if(comment.owner.to_string() !== req.user?._id.to_string()){
+        throw new ApiError(400 , "unauthorized request")
+    }
+
+    await Comment.findByIdAndDelete(commentId)
+
+    return res.status(201).json(new ApiResponse(200 , _ , "comment deleted successfully"))
 })
 
 export {
